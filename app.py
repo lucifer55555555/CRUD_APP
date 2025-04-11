@@ -1,45 +1,85 @@
 import mysql.connector
 
-# Step 1: Connect to MySQL
+# ----------------------------
+# Database Connection
+# ----------------------------
 db = mysql.connector.connect(
     host="localhost",
-    user="root",       # ← replace with your MySQL username (e.g., root)
-    password="pratham@2005",   # ← replace with your MySQL password
-    database="bookstore"
+    user="root",         # your MySQL username
+    password="pratham@2005",         # your password, often blank with XAMPP
+    database="crud_app"
 )
-
 cursor = db.cursor()
+print("Connected to MySQL database!")
 
-# Step 2: INSERT (Create)
-def create_book(title, author, price):
-    cursor.execute("INSERT INTO books (title, author, price) VALUES (%s, %s, %s)", (title, author, price))
+# ----------------------------
+# CRUD Functions
+# ----------------------------
+
+def create_user(name, email):
+    query = "INSERT INTO users (name, email) VALUES (%s, %s)"
+    values = (name, email)
+    cursor.execute(query, values)
     db.commit()
-    print("Book added!")
+    print("✅ User added successfully!")
 
-# Step 3: SELECT (Read)
-def read_books():
-    cursor.execute("SELECT * FROM books")
-    for book in cursor.fetchall():
-        print(book)
+def read_users():
+    cursor.execute("SELECT * FROM users")
+    result = cursor.fetchall()
+    print("\n📄 All Users:")
+    for row in result:
+        print(f"ID: {row[0]}, Name: {row[1]}, Email: {row[2]}")
 
-# Step 4: UPDATE
-def update_price(book_id, new_price):
-    cursor.execute("UPDATE books SET price = %s WHERE id = %s", (new_price, book_id))
+def update_user(user_id, name, email):
+    query = "UPDATE users SET name = %s, email = %s WHERE id = %s"
+    values = (name, email, user_id)
+    cursor.execute(query, values)
     db.commit()
-    print("Price updated!")
+    print("✏️ User updated successfully!")
 
-# Step 5: DELETE
-def delete_book(book_id):
-    cursor.execute("DELETE FROM books WHERE id = %s", (book_id,))
+def delete_user(user_id):
+    query = "DELETE FROM users WHERE id = %s"
+    value = (user_id,)
+    cursor.execute(query, value)
     db.commit()
-    print("Book deleted!")
+    print("🗑️ User deleted successfully!")
 
-# Try the functions:
-create_book("The Alchemist", "Paulo Coelho", 10.99)
-read_books()
-update_price(1, 12.99)
-delete_book(1)
+# ----------------------------
+# Menu Loop
+# ----------------------------
 
-# Step 6: Close connection
-cursor.close()
-db.close()
+while True:
+    print("\n========== User Management ==========")
+    print("1. Add User")
+    print("2. Show All Users")
+    print("3. Update User")
+    print("4. Delete User")
+    print("5. Exit")
+    print("=====================================")
+
+    choice = input("Enter your choice (1-5): ")
+
+    if choice == '1':
+        name = input("Enter name: ")
+        email = input("Enter email: ")
+        create_user(name, email)
+
+    elif choice == '2':
+        read_users()
+
+    elif choice == '3':
+        user_id = input("Enter user ID to update: ")
+        name = input("Enter new name: ")
+        email = input("Enter new email: ")
+        update_user(user_id, name, email)
+
+    elif choice == '4':
+        user_id = input("Enter user ID to delete: ")
+        delete_user(user_id)
+
+    elif choice == '5':
+        print("👋 Exiting...")
+        break
+
+    else:
+        print("❌ Invalid choice. Please enter a number from 1 to 5.")
